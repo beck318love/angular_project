@@ -1,2 +1,115 @@
-<h3>Welcome</h3>
-<p><%= link_to 'Users:', users_path %> <%= User.count %> registered</p>
+<div ng-controller="TestCtrl">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3" id="titlediv">
+      <h3>Welcome</h3>
+    </div>
+    <div class="col-md-6 col-md-offset-3 alert" ng-show="message" id="infodiv">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-show="message">×</button>
+      <div id="flash_notice"></div>
+    </div>
+  </div>
+
+  <!-- Dash_Board -->
+  <div class="row" ng-show="currentUser==false && signup == '0'">
+    <form id="loginform" name="loginform" novalidate class="col-md-6 col-md-offset-3">
+      <div class="authform">
+        <div class="form-group">
+          <span style="font-weight:bold;">* User_Email</span>
+          <input id="log_email" name="log_email" class="form-control" type="email" ng-model="credentials_login.email" ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" style="width:100%" required/>
+          <div ng-show="loginform.$submitted || loginform.log_email.$touched">
+            <div ng-show="loginform.log_email.$error.required" style="color:red;">Please enter your email.</div>
+            <div ng-show="loginform.log_email.$error.pattern" style="color:red;">email's type is change@123.com</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <span style="font-weight:bold;">* Password</span>
+          <input id="log_password" name="log_password" class="form-control" type="password" ng-model="credentials_login.password" style="width:100%" required/>
+          <div ng-show="loginform.$submitted || loginform.log_password.$touched">
+            <div ng-show="loginform.log_password.$error.required" style="color:red;">Please enter your password.</div>
+          </div>
+        </div>
+        <div class="row">
+          <button class="col-md-3 col-md-offset-4 btn btn-success" ng-click="submitLogin()" style="">Login</button>
+          <button class="col-md-3 col-md-offset-1 btn btn-info" type="button" ng-click="sign_up()">Sign Up</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Signup_Board -->
+  <div class="row" ng-show="currentUser==false && signup=='1'">
+    <form id="signform" name="signform" novalidate class="col-md-6 col-md-offset-3">
+      <div class="authform">
+        <div class="row">
+          <div class="form-group col-md-6">
+            <span style="font-weight:bold;">* First Name</span>
+            <input id="First_Name" class="form-control" name="First_Name" type="text" ng-model="credentials_signup.First_Name" style="width:100%" required/>
+            <div ng-show="signform.$submitted || signform.First_Name.$touched">
+              <div ng-show="signform.First_Name.$error.required" style="color:red;">Enter your First Name.</div>
+            </div>
+          </div>
+          <div class="form-group col-md-6">
+            <span style="font-weight:bold;">* Last Name</span>
+            <input id="Last_Name" class="form-control" name="Last_Name" type="text" ng-model="credentials_signup.Last_Name" style="width:100%" required/>
+            <div ng-show="signform.$submitted || signform.Last_Name.$touched">
+              <div ng-show="signform.Last_Name.$error.required" style="color:red;">Enter your last name.</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <span style="font-weight:bold;">* Email</span>
+          <input id="sign_email" class="form-control" name="sign_email" type="email" ng-model="credentials_signup.email" ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/" style="width:100%" required/>
+          <div ng-show="signform.$submitted || signform.sign_email.$touched">
+            <div ng-show="signform.sign_email.$error.required" style="color:red;">Please enter your email.</div>
+            <div ng-show="signform.sign_email.$error.pattern" style="color:red;">email's type is change@123.com</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <span style="font-weight:bold;"> Phone Number</span>
+          <input id="Phone_Num" class="form-control" name="Phone_Num" type="text" ng-model="credentials_signup.Phone_Num" style="width:100%"/>
+        </div>
+        <div class="form-group">
+          <span style="font-weight:bold;">* Password</span>
+          <input id="sign_password" class="form-control" name="sign_password" type="password" ng-model="credentials_signup.password" style="width:100%" required/>
+          <div ng-show="signform.$submitted || signform.sign_password.$touched">
+            <div ng-show="signform.sign_password.$error.required" style="color:red;">Enter your password.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <span style="font-weight:bold;">* Password Confirmation</span>
+          <input id="sign_password_confirmation" class="form-control" name="sign_password_confirmation" type="password" ng-model="credentials_signup.password_confirmation" ng-pattern="(credentials_signup.password)" style="width:100%" required/>
+          <div ng-show="signform.$submitted || signform.sign_password_confirmation.$touched">
+            <div ng-show="signform.sign_password_confirmation.$error.required" style="color:red;">Repeat your password.</div>
+            <div ng-show="!signform.sign_password_confirmation.$error.required && signform.sign_password_confirmation.$error.pattern" style="color:red;">Passwords don't match!</div>
+          </div>
+        </div>
+        <button class="col-md-4 col-md-offset-4 btn btn-success" ng-click="submitSignup()">Sign up</button>
+        <button class="col-md-3 col-md-offset-1 btn btn-primary" type="button" ng-click="submitBack()" style="margin-left:10px;">Back</button>
+      </div>
+    </form> 
+  </div>
+
+  <!-- Loginfo_Board -->
+  <div class="row" ng-show="currentUser!=false">
+    <div class="col-md-6 col-md-offset-3">
+      <table class="table">
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Phone Num</th>
+        </tr>
+        <tr>
+          <td>{{ currentUser.First_Name }}</td>
+          <td>{{ currentUser.Last_Name }}</td>
+          <td>{{ currentUser.email }}</td>
+          <td>{{ currentUser.Phone_Num }}</td>
+        </tr>
+      </table>
+      <div class="row">
+        <button class="col-md-3 col-md-offset-5 btn btn-success" onclick="location.href='/users/edit'">Edit</button>
+        <button class="col-md-2 col-md-offset-1 btn btn-primary" ng-click="submitLogout()">Log-out</button>
+      </div>
+    </div>
+  </div>
+</div>
